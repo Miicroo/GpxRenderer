@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>GPX overlay</title>
+    <link rel="stylesheet" href="style.css" />
+	<script src="https://maps.googleapis.com/maps/api/js"></script>
+	<script src="backend.js"></script>
+	<script type="text/javascript">
+		function initMap() {
+			var map = new google.maps.Map(document.getElementById('map'), {
+				zoom: 10,
+				center: {lat: 0, lng: 0},
+				mapTypeId: google.maps.MapTypeId.TERRAIN
+			});
+			
+			var allPoints = [];
+			var gpsFuncs = getAllGpsFuncs();
+			var numPoints = gpsFuncs.length;
+			for(var i = 0; i<numPoints; i++) {
+				var gpsFunc = gpsFuncs[i];
+				var coordinates = gpsFunc(); // Execute function to return coordinates
+				createPath(map, coordinates, '#0000ff', 1);
+				
+				allPoints.push.apply(allPoints, coordinates);
+			}
+			
+			autoZoom(map, allPoints);
+		}
+		
+		function createPath(map, coordinates, color, opacity) {
+			var path = new google.maps.Polyline({
+				path: coordinates,
+				geodesic: true,
+				strokeColor: color,
+				strokeOpacity: opacity,
+				strokeWeight: 1
+			});
+
+			path.setMap(map);
+		}
+		
+		function autoZoom(map, points) {
+			if(points.length <= 1) {
+				return;
+			}
+			
+			var bounds = new google.maps.LatLngBounds();
+			for (var i = 0; i < points.length; i++) {
+				var latLng = new google.maps.LatLng(points[i].lat, points[i].lng);		
+				bounds.extend(latLng);
+			}
+			map.fitBounds(bounds);
+		}
+	</script>
+  </head>
+  <body>
+	<div id="map"></div>
+	<script type="text/javascript">
+		initMap();
+	</script>
+  </body>
+</html>
