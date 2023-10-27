@@ -18,7 +18,7 @@ def getGpxFiles():
     return [abspath(join(path, f)) for f in listdir(path) if isfile(join(path, f)) and f.endswith(".gpx")]
 
 def parseGpx(filename):
-    print "Parsing " + filename
+    print("Parsing " + filename)
     
     template = string.Template("{http://www.topografix.com/GPX/1/1}$tag")
     trkptTag = template.substitute(tag="trkpt")
@@ -85,7 +85,7 @@ def main():
         allJsFuncs.append(funcname)
         jsData += jsFunc
 
-        print str(i+1) + " of " + str(len(gpxFiles)) + " done"
+        print(str(i+1) + " of " + str(len(gpxFiles)) + " done")
 
     jsContainerFunc = getAllJsFunc(allJsFuncs)
 
