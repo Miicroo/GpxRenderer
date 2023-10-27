@@ -3,22 +3,31 @@
   <head>
 	<title>GPX renderer</title>
     	<link rel="stylesheet" href="style.css" />
-	<script src="https://maps.googleapis.com/maps/api/js"></script>
 	<script src="backend.js"></script>
 	<script type="text/javascript">
 		function initMap() {
-			var map = new google.maps.Map(document.getElementById('map'), {
+			const map = new google.maps.Map(document.getElementById('map'), {
 				zoom: 10,
 				center: {lat: 0, lng: 0},
-				mapTypeId: google.maps.MapTypeId.TERRAIN
+				mapTypeId: "OSM"
 			});
-			
-			var allPoints = [];
-			var gpsFuncs = getAllGpsFuncs();
-			var numPoints = gpsFuncs.length;
-			for(var i = 0; i<numPoints; i++) {
-				var gpsFunc = gpsFuncs[i];
-				var coordinates = gpsFunc(); // Execute function to return coordinates
+
+			// Define OSM map type pointing at the OpenStreetMap tile server
+			map.mapTypes.set("OSM", new google.maps.ImageMapType({
+			  getTileUrl: function(coord, zoom) {
+				return "https://tile.openstreetmap.org/" + zoom + "/" + coord.x + "/" + coord.y + ".png";
+			  },
+			  tileSize: new google.maps.Size(256, 256),
+			  name: "OpenStreetMap",
+			  maxZoom: 18
+			}));
+
+			const allPoints = [];
+			const gpsFuncs = getAllGpsFuncs();
+			const numPoints = gpsFuncs.length;
+			for(let i = 0; i<numPoints; i++) {
+				const gpsFunc = gpsFuncs[i];
+				const coordinates = gpsFunc(); // Execute function to return coordinates
 				createPath(map, coordinates, '#0000ff', 1);
 				
 				allPoints.push.apply(allPoints, coordinates);
@@ -28,7 +37,7 @@
 		}
 		
 		function createPath(map, coordinates, color, opacity) {
-			var path = new google.maps.Polyline({
+			const path = new google.maps.Polyline({
 				path: coordinates,
 				geodesic: true,
 				strokeColor: color,
@@ -40,13 +49,13 @@
 		}
 		
 		function autoZoom(map, points) {
-			if(points.length <= 1) {
+			if (points.length <= 1) {
 				return;
 			}
 			
-			var bounds = new google.maps.LatLngBounds();
-			for (var i = 0; i < points.length; i++) {
-				var latLng = new google.maps.LatLng(points[i].lat, points[i].lng);		
+			const bounds = new google.maps.LatLngBounds();
+			for (let i = 0; i < points.length; i++) {
+				const latLng = new google.maps.LatLng(points[i].lat, points[i].lng);
 				bounds.extend(latLng);
 			}
 			map.fitBounds(bounds);
@@ -56,7 +65,14 @@
   <body>
 	<div id="map"></div>
 	<script type="text/javascript">
-		initMap();
+		function loadScript() {
+			var script = document.createElement('script');
+			script.type = 'text/javascript';
+			script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDztlrk_3CnzGHo7CFvLFqE_2bUKEq1JEU&callback=initMap';
+			document.body.appendChild(script);
+		}
+
+		window.onload = loadScript;
 	</script>
   </body>
 </html>
